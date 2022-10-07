@@ -1,6 +1,7 @@
 {
   "name": "astro-session",
   "dependencies": {
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "lodash.merge": "^4.6.2"
   }
 }
