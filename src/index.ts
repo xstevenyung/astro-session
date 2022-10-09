@@ -20,7 +20,7 @@ export const defaultCookieSessionOptions: CookieSessionOptions = {
 };
 
 export function createCookieSessionStorage(
-  options: Partial<CookieSessionOptions>
+  options: Partial<CookieSessionOptions> = {}
 ) {
   if (!options?.cookie?.secret) {
     console.warn(
