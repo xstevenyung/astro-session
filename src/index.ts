@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import merge from "lodash.merge";
 
-export type Session = {};
-
 export type CookieSessionOptions = {
   cookie: {
     name: string;
@@ -19,7 +17,7 @@ export const defaultCookieSessionOptions: CookieSessionOptions = {
   },
 };
 
-export function createCookieSessionStorage(
+export function createCookieSessionStorage<T = any>(
   options: Partial<CookieSessionOptions> = {}
 ) {
   if (!options?.cookie?.secret) {
@@ -30,11 +28,11 @@ export function createCookieSessionStorage(
 
   const { cookie } = merge(defaultCookieSessionOptions, options);
 
-  const getSession = (request: Request): Partial<Session> => {
+  const getSession = (request: Request): Session => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
-      return {};
+      return new Session();
     }
 
     const cookies = new Map();
@@ -45,18 +43,81 @@ export function createCookieSessionStorage(
     }
 
     if (!cookies.get(cookie.name)) {
-      return {};
+      return new Session();
     }
 
-    return jwt.verify(cookies.get(cookie.name), cookie.secret) as Session;
+    const { data } = jwt.verify(cookies.get(cookie.name), cookie.secret);
+    console.log({ data });
+
+    return new Session(data);
   };
 
-  const commitSession = (session: Partial<Session>) => {
+  const commitSession = (session: Session) => {
+    console.log({ test: session.toJSON() });
     return [
-      `${cookie.name}=${jwt.sign(session, cookie.secret)}`,
+      `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,
     ].join("; ");
   };
 
+  // const destroySession = (session: Session) => {
+  //   return new Session();
+  // };
+
   return { getSession, commitSession };
+}
+
+export class Session {
+  #data = new Map();
+  #flash = new Map();
+
+  constructor(data = {}, flash = {}) {
+    this.#data = new Map(Object.entries(data));
+    this.#flash = new Map(Object.entries(flash));
+  }
+
+  get data() {
+    return Object.fromEntries(this.#data);
+  }
+
+  get flashedData() {
+    return Object.fromEntries(this.#flash);
+  }
+
+  set(key: string, value: any) {
+    this.#data.set(key, value);
+
+    return this;
+  }
+
+  get(key: string) {
+    return this.#data.get(key);
+  }
+
+  has(key: string) {
+    return this.#data.has(key);
+  }
+
+  clear() {
+    this.#data.clear();
+    return this;
+  }
+
+  flash(key: string, value?: any) {
+    if (value === undefined) {
+      const flashedValue = this.#flash.get(key);
+
+      this.#flash.delete(key);
+
+      return flashedValue;
+    }
+
+    this.#flash.set(key, value);
+
+    return this;
+  }
+
+  toJSON() {
+    return { data: Object.fromEntries(this.#data) };
+  }
 }

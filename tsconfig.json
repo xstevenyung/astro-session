@@ -3,6 +3,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationDir": "dist",
+    "target": "ESNext",
     "module": "commonjs"
   },
   "exclude": ["node_modules", "example"]

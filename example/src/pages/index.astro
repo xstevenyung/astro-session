@@ -13,7 +13,7 @@ const session = getSession(Astro.request);
     <section>
       <h2>Your session</h2>
       <code>
-        {JSON.stringify(session)}
+        {JSON.stringify(session.toJSON())}
       </code>
     </section>
 
