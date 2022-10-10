@@ -47,13 +47,11 @@ export function createCookieSessionStorage<T = any>(
     }
 
     const { data } = jwt.verify(cookies.get(cookie.name), cookie.secret);
-    console.log({ data });
 
     return new Session(data);
   };
 
   const commitSession = (session: Session) => {
-    console.log({ test: session.toJSON() });
     return [
       `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,
