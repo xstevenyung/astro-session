@@ -85,6 +85,10 @@ export class Session {
   }
 
   set(key: string, value: any) {
+    if (typeof value === "function") {
+      value = value(this.get(key));
+    }
+
     this.#data.set(key, value);
 
     return this;
