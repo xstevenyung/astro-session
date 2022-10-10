@@ -46,9 +46,9 @@ export function createCookieSessionStorage<T = any>(
       return new Session();
     }
 
-    const { data } = jwt.verify(cookies.get(cookie.name), cookie.secret);
+    const { data, flash } = jwt.verify(cookies.get(cookie.name), cookie.secret);
 
-    return new Session(data);
+    return new Session(data, flash);
   };
 
   const commitSession = (session: Session) => {
@@ -120,6 +120,9 @@ export class Session {
   }
 
   toJSON() {
-    return { data: Object.fromEntries(this.#data) };
+    return {
+      data: Object.fromEntries(this.#data),
+      flash: Object.fromEntries(this.#flash),
+    };
   }
 }

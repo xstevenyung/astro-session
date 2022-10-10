@@ -1,9 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import { getSession } from "../utils/session";
+import { commitSession, getSession } from "../utils/session";
 
 const session = getSession(Astro.request);
+const msg = session.flash("success");
+
+Astro.response.headers.set("set-cookie", commitSession(session));
 ---
 
 <Layout title="Welcome to Astro.">
@@ -12,6 +15,9 @@ const session = getSession(Astro.request);
 
     <section>
       <h2>Your session</h2>
+
+      {msg && <p style="background-color: green">{msg}</p>}
+
       <code>
         {JSON.stringify(session.toJSON())}
       </code>
@@ -22,6 +28,12 @@ const session = getSession(Astro.request);
         href="/api/add-in-session"
         title="Add data in session"
         body="Test adding some data into the session"
+      />
+
+      <Card
+        href="/api/flash-in-session"
+        title="Add flash data in session"
+        body="Test adding some flashed data into the session"
       />
     </ul>
   </main>
