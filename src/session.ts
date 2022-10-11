@@ -1,8 +1,10 @@
-export class Session {
-  #data = {};
+export type BaseDataType = { [key: string]: any };
+
+export class Session<DataType extends BaseDataType> {
+  #data: DataType;
   #flash = {};
 
-  constructor(data = {}, flash = {}) {
+  constructor(data = {} as DataType, flash: any = {}) {
     this.#data = data;
     this.#flash = flash;
   }
@@ -15,7 +17,7 @@ export class Session {
     return this.#flash;
   }
 
-  set(key: string, value: any) {
+  set(key: keyof DataType, value: any) {
     if (typeof value === "function") {
       value = value(this.get(key));
     }
@@ -25,7 +27,7 @@ export class Session {
     return this;
   }
 
-  get(key: string) {
+  get(key: keyof DataType) {
     return this.#data[key];
   }
 

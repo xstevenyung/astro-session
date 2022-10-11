@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import merge from "lodash.merge";
-import { Session } from "./session";
+import { BaseDataType, Session } from "./session";
 
 export type CookieSessionOptions = {
   cookie: {
@@ -18,7 +18,7 @@ export const defaultCookieSessionOptions: CookieSessionOptions = {
   },
 };
 
-export function createCookieSessionStorage(
+export function createCookieSessionStorage<DataType = BaseDataType>(
   options: Partial<CookieSessionOptions> = {}
 ) {
   if (!options?.cookie?.secret) {
@@ -29,11 +29,11 @@ export function createCookieSessionStorage(
 
   const { cookie } = merge(defaultCookieSessionOptions, options);
 
-  const getSession = (request: Request): Session => {
+  const getSession = <T = DataType>(request: Request): Session<T> => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
-      return new Session();
+      return new Session<T>();
     }
 
     const cookies = new Map();
@@ -44,7 +44,7 @@ export function createCookieSessionStorage(
     }
 
     if (!cookies.get(cookie.name)) {
-      return new Session();
+      return new Session<T>();
     }
 
     try {
@@ -52,14 +52,14 @@ export function createCookieSessionStorage(
         cookies.get(cookie.name),
         cookie.secret
       );
-      return new Session(data, flash);
+      return new Session<T>(data, flash);
     } catch (e) {
       // If signature verification fails, we will just set an empty session
-      return new Session();
+      return new Session<T>();
     }
   };
 
-  const commitSession = (session: Session) => {
+  const commitSession = (session: Session<DataType>) => {
     return [
       `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,
@@ -67,7 +67,7 @@ export function createCookieSessionStorage(
   };
 
   // const destroySession = (session: Session) => {
-  //   return new Session();
+  //   return new Session<DataType>();
   // };
 
   return { getSession, commitSession };
