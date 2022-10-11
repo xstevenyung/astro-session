@@ -18,7 +18,7 @@ export const defaultCookieSessionOptions: CookieSessionOptions = {
   },
 };
 
-export function createCookieSessionStorage<T = any>(
+export function createCookieSessionStorage<Data = any>(
   options: Partial<CookieSessionOptions> = {}
 ) {
   if (!options?.cookie?.secret) {
@@ -29,11 +29,11 @@ export function createCookieSessionStorage<T = any>(
 
   const { cookie } = merge(defaultCookieSessionOptions, options);
 
-  const getSession = (request: Request): Session => {
+  const getSession = (request: Request): Session<Data> => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
-      return new Session();
+      return new Session<Data>();
     }
 
     const cookies = new Map();
@@ -44,15 +44,22 @@ export function createCookieSessionStorage<T = any>(
     }
 
     if (!cookies.get(cookie.name)) {
-      return new Session();
+      return new Session<Data>();
     }
 
-    const { data, flash } = jwt.verify(cookies.get(cookie.name), cookie.secret);
-
-    return new Session(data, flash);
+    try {
+      const { data, flash } = jwt.verify(
+        cookies.get(cookie.name),
+        cookie.secret
+      );
+      return new Session<Data>(data, flash);
+    } catch (e) {
+      // If signature verification fails, we will just set an empty session
+      return new Session<T>();
+    }
   };
 
-  const commitSession = (session: Session) => {
+  const commitSession = (session: Session<Data>) => {
     return [
       `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,

@@ -1,4 +1,4 @@
-export class Session {
+export class Session<Data = any> {
   #data = new Map();
   #flash = new Map();
 
