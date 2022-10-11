@@ -6,7 +6,7 @@ export class Session<DataType extends BaseDataType> {
   #data: DataType;
   #flash = {};
 
-  constructor(data = {} as DataType, flash: any = {}) {
+  constructor(data: DataType, flash: any = {}) {
     this.#data = data;
     this.#flash = flash;
   }

@@ -10,17 +10,18 @@ export type CookieSessionOptions = {
   };
 };
 
-export const defaultCookieSessionOptions: CookieSessionOptions = {
-  cookie: {
-    name: "__session_id",
-    path: "/",
-    secret: "not-secret",
-  },
-};
-
 export function createCookieSessionStorage<DataType = BaseDataType>(
+  initialData: DataType,
   options: Partial<CookieSessionOptions> = {}
 ) {
+  const defaultCookieSessionOptions: CookieSessionOptions = {
+    cookie: {
+      name: "__session_id",
+      path: "/",
+      secret: "not-secret",
+    },
+  };
+
   if (!options?.cookie?.secret) {
     console.warn(
       "[ASTRO SESSION] Warning: We didn't detect a secret, if you are in production please fix this ASAP to avoid any security issue."
@@ -29,11 +30,14 @@ export function createCookieSessionStorage<DataType = BaseDataType>(
 
   const { cookie } = merge(defaultCookieSessionOptions, options);
 
-  const getSession = <T = DataType>(request: Request): Session<T> => {
+  const createFreshSession = (data: Partial<DataType> = {}, flash: any = {}) =>
+    new Session<DataType>(merge({ ...initialData }, data), flash);
+
+  const getSession = (request: Request): Session<DataType> => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
-      return new Session<T>();
+      return createFreshSession();
     }
 
     const cookies = new Map();
@@ -44,7 +48,7 @@ export function createCookieSessionStorage<DataType = BaseDataType>(
     }
 
     if (!cookies.get(cookie.name)) {
-      return new Session<T>();
+      return createFreshSession();
     }
 
     try {
@@ -52,10 +56,11 @@ export function createCookieSessionStorage<DataType = BaseDataType>(
         cookies.get(cookie.name),
         cookie.secret
       );
-      return new Session<T>(data, flash);
+
+      return createFreshSession(data, flash);
     } catch (e) {
       // If signature verification fails, we will just set an empty session
-      return new Session<T>();
+      return createFreshSession();
     }
   };
 

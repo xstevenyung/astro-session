@@ -4,4 +4,6 @@ export type Data = {
   count: number;
 };
 
-export const { getSession, commitSession } = createCookieSessionStorage<Data>();
+export const { getSession, commitSession } = createCookieSessionStorage<Data>({
+  count: 0,
+});
