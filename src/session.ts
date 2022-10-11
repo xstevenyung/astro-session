@@ -1,5 +1,7 @@
 export type BaseDataType = { [key: string]: any };
 
+export type SetFunction<T> = (value: T) => T;
+
 export class Session<DataType extends BaseDataType> {
   #data: DataType;
   #flash = {};
@@ -17,12 +19,17 @@ export class Session<DataType extends BaseDataType> {
     return this.#flash;
   }
 
-  set(key: keyof DataType, value: any) {
+  set(
+    key: keyof DataType,
+    value: DataType[typeof key] | SetFunction<DataType[typeof key]>
+  ) {
     if (typeof value === "function") {
-      value = value(this.get(key));
+      const fn: SetFunction<DataType[typeof key]> = value;
+      value = fn(this.get(key));
     }
 
-    this.#data[key] = value;
+    // We force value type as the condition above is not enough for typescript to infer type
+    this.#data[key] = value as DataType[typeof key];
 
     return this;
   }
@@ -31,7 +38,7 @@ export class Session<DataType extends BaseDataType> {
     return this.#data[key];
   }
 
-  has(key: string) {
+  has(key: keyof DataType) {
     return !!this.#data[key];
   }
 
