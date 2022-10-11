@@ -7,6 +7,8 @@ const session = getSession(Astro.request);
 const msg = session.flash("success");
 
 Astro.response.headers.set("set-cookie", commitSession(session));
+
+const count = session.get("count");
 ---
 
 <Layout title="Welcome to Astro.">
@@ -21,6 +23,8 @@ Astro.response.headers.set("set-cookie", commitSession(session));
       <code>
         {JSON.stringify(session.toJSON())}
       </code>
+
+      <p>My count: <b>{count}</b></p>
     </section>
 
     <ul role="list" class="link-card-grid">

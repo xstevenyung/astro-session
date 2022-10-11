@@ -1,61 +1,69 @@
-export class Session {
-  #data = new Map();
-  #flash = new Map();
+export type BaseDataType = { [key: string]: any };
 
-  constructor(data = {}, flash = {}) {
-    this.#data = new Map(Object.entries(data));
-    this.#flash = new Map(Object.entries(flash));
+export type SetFunction<T> = (value: T) => T;
+
+export class Session<DataType extends BaseDataType> {
+  #data: DataType;
+  #flash = {};
+
+  constructor(data: DataType, flash: any = {}) {
+    this.#data = data;
+    this.#flash = flash;
   }
 
   get data() {
-    return Object.fromEntries(this.#data);
+    return this.#data;
   }
 
   get flashedData() {
-    return Object.fromEntries(this.#flash);
+    return this.#flash;
   }
 
-  set(key: string, value: any) {
+  set(
+    key: keyof DataType,
+    value: DataType[typeof key] | SetFunction<DataType[typeof key]>
+  ) {
     if (typeof value === "function") {
-      value = value(this.get(key));
+      const fn: SetFunction<DataType[typeof key]> = value;
+      value = fn(this.get(key));
     }
 
-    this.#data.set(key, value);
+    // We force value type as the condition above is not enough for typescript to infer type
+    this.#data[key] = value as DataType[typeof key];
 
     return this;
   }
 
-  get(key: string) {
-    return this.#data.get(key);
+  get(key: keyof DataType) {
+    return this.#data[key];
   }
 
-  has(key: string) {
-    return this.#data.has(key);
+  has(key: keyof DataType) {
+    return !!this.#data[key];
   }
 
   clear() {
-    this.#data.clear();
-    return this;
+    return new self();
   }
 
   flash(key: string, value?: any) {
     if (value === undefined) {
-      const flashedValue = this.#flash.get(key);
+      const flashedValue = this.#flash[key];
 
-      this.#flash.delete(key);
+      delete this.#flash[key];
 
       return flashedValue;
     }
 
-    this.#flash.set(key, value);
+    this.#flash[key] = value;
 
     return this;
   }
 
   toJSON() {
     return {
-      data: Object.fromEntries(this.#data),
-      flash: Object.fromEntries(this.#flash),
+      data: this.#data,
+      flash: this.#flash,
     };
   }
 }

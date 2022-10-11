@@ -4,7 +4,7 @@ import { commitSession, getSession } from "../../utils/session";
 export function get({ request }: APIContext) {
   const session = getSession(request);
 
-  session.set("count", (value) => (value || 0) + 1);
+  session.set("count", (value) => value + 1);
 
   return new Response(null, {
     status: 302,

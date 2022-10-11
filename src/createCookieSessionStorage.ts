@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import merge from "lodash.merge";
-import { Session } from "./session";
+import { BaseDataType, Session } from "./session";
 
 export type CookieSessionOptions = {
   cookie: {
@@ -10,17 +10,18 @@ export type CookieSessionOptions = {
   };
 };
 
-export const defaultCookieSessionOptions: CookieSessionOptions = {
-  cookie: {
-    name: "__session_id",
-    path: "/",
-    secret: "not-secret",
-  },
-};
-
-export function createCookieSessionStorage(
+export function createCookieSessionStorage<DataType = BaseDataType>(
+  initialData: DataType,
   options: Partial<CookieSessionOptions> = {}
 ) {
+  const defaultCookieSessionOptions: CookieSessionOptions = {
+    cookie: {
+      name: "__session_id",
+      path: "/",
+      secret: "not-secret",
+    },
+  };
+
   if (!options?.cookie?.secret) {
     console.warn(
       "[ASTRO SESSION] Warning: We didn't detect a secret, if you are in production please fix this ASAP to avoid any security issue."
@@ -29,11 +30,14 @@ export function createCookieSessionStorage(
 
   const { cookie } = merge(defaultCookieSessionOptions, options);
 
-  const getSession = (request: Request): Session => {
+  const createFreshSession = (data: Partial<DataType> = {}, flash: any = {}) =>
+    new Session<DataType>(merge({ ...initialData }, data), flash);
+
+  const getSession = (request: Request): Session<DataType> => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
-      return new Session();
+      return createFreshSession();
     }
 
     const cookies = new Map();
@@ -44,7 +48,7 @@ export function createCookieSessionStorage(
     }
 
     if (!cookies.get(cookie.name)) {
-      return new Session();
+      return createFreshSession();
     }
 
     try {
@@ -52,14 +56,15 @@ export function createCookieSessionStorage(
         cookies.get(cookie.name),
         cookie.secret
       );
-      return new Session(data, flash);
+
+      return createFreshSession(data, flash);
     } catch (e) {
       // If signature verification fails, we will just set an empty session
-      return new Session();
+      return createFreshSession();
     }
   };
 
-  const commitSession = (session: Session) => {
+  const commitSession = (session: Session<DataType>) => {
     return [
       `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,
@@ -67,7 +72,7 @@ export function createCookieSessionStorage(
   };
 
   // const destroySession = (session: Session) => {
-  //   return new Session();
+  //   return new Session<DataType>();
   // };
 
   return { getSession, commitSession };

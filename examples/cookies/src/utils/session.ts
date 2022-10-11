@@ -1,3 +1,9 @@
 import { createCookieSessionStorage } from "astro-session";
 
-export const { getSession, commitSession } = createCookieSessionStorage();
+export type Data = {
+  count: number;
+};
+
+export const { getSession, commitSession } = createCookieSessionStorage<Data>({
+  count: 0,
+});
