@@ -3,16 +3,22 @@ import merge from "lodash.merge";
 import { BaseDataType, Session } from "./session";
 
 export type CookieSessionOptions = {
-  cookie: {
-    name: string;
-    path: string;
-    secret: string;
-  };
+  cookie: CookieOptions;
 };
+
+export type CookieOptions = {
+  name: string;
+  path: string;
+  secret: string;
+};
+
+export type PartialCookieSessionOptions = Partial<{
+  cookie: Partial<CookieSessionOptions["cookie"]>;
+}>;
 
 export function createCookieSessionStorage<DataType = BaseDataType>(
   initialData: DataType,
-  options: Partial<CookieSessionOptions> = {}
+  options: PartialCookieSessionOptions = {}
 ) {
   const defaultCookieSessionOptions: CookieSessionOptions = {
     cookie: {
