@@ -1,18 +1,18 @@
 export class Session {
-  #data = new Map();
-  #flash = new Map();
+  #data = {};
+  #flash = {};
 
   constructor(data = {}, flash = {}) {
-    this.#data = new Map(Object.entries(data));
-    this.#flash = new Map(Object.entries(flash));
+    this.#data = data;
+    this.#flash = flash;
   }
 
   get data() {
-    return Object.fromEntries(this.#data);
+    return this.#data;
   }
 
   get flashedData() {
-    return Object.fromEntries(this.#flash);
+    return this.#flash;
   }
 
   set(key: string, value: any) {
@@ -20,42 +20,41 @@ export class Session {
       value = value(this.get(key));
     }
 
-    this.#data.set(key, value);
+    this.#data[key] = value;
 
     return this;
   }
 
   get(key: string) {
-    return this.#data.get(key);
+    return this.#data[key];
   }
 
   has(key: string) {
-    return this.#data.has(key);
+    return !!this.#data[key];
   }
 
   clear() {
-    this.#data.clear();
-    return this;
+    return new self();
   }
 
   flash(key: string, value?: any) {
     if (value === undefined) {
-      const flashedValue = this.#flash.get(key);
+      const flashedValue = this.#flash[key];
 
-      this.#flash.delete(key);
+      delete this.#flash[key];
 
       return flashedValue;
     }
 
-    this.#flash.set(key, value);
+    this.#flash[key] = value;
 
     return this;
   }
 
   toJSON() {
     return {
-      data: Object.fromEntries(this.#data),
-      flash: Object.fromEntries(this.#flash),
+      data: this.#data,
+      flash: this.#flash,
     };
   }
 }
