@@ -1,8 +1,8 @@
 import type { APIContext } from "astro";
 import { commitSession, getSession } from "../../utils/session";
 
-export function get({ request }: APIContext) {
-  const session = getSession(request);
+export async function get({ request }: APIContext) {
+  const session = await getSession(request);
 
   session.set("count", (value) => value + 1);
 
@@ -10,7 +10,7 @@ export function get({ request }: APIContext) {
     status: 302,
     headers: {
       location: "/",
-      "set-cookie": commitSession(session),
+      "set-cookie": await commitSession(session),
     },
   });
 }
