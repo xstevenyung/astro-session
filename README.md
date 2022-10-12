@@ -154,6 +154,10 @@ Astro.response.headers.set("set-cookie", commitSession(session));
 
 Flash data are only accessible once and are deleted just after. They are used for passing down data to the next page for success / error message for example.
 
+### Your question is not listed?
+
+We make sure to include as much information in this section as possible. If you didn't find an answer here, feel free to open an issue with your question and we will be happy to guide you out!
+
 ## Credits
 
 Astro Session took a lot of inspirations from [Remix](https://remix.run/) session API and [Fresh Session](https://github.com/xstevenyung/fresh-session)
