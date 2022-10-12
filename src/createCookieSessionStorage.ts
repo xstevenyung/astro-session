@@ -39,7 +39,7 @@ export function createCookieSessionStorage<DataType = BaseDataType>(
   const createFreshSession = (data: Partial<DataType> = {}, flash: any = {}) =>
     new Session<DataType>(merge({ ...initialData }, data), flash);
 
-  const getSession = (request: Request): Session<DataType> => {
+  const getSession = async (request: Request): Promise<Session<DataType>> => {
     const rawCookies = request.headers.get("cookie");
 
     if (!rawCookies) {
@@ -70,7 +70,7 @@ export function createCookieSessionStorage<DataType = BaseDataType>(
     }
   };
 
-  const commitSession = (session: Session<DataType>) => {
+  const commitSession = async (session: Session<DataType>) => {
     return [
       `${cookie.name}=${jwt.sign(session.toJSON(), cookie.secret)}`,
       `Path=${cookie.path}`,
