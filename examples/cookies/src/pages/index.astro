@@ -2,8 +2,10 @@
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import { commitSession, getSession } from "../utils/session";
+import Alert from "../components/Alert.astro";
 
 const session = await getSession(Astro.request);
+
 const msg = session.flash("success");
 
 Astro.response.headers.set("set-cookie", await commitSession(session));
@@ -16,9 +18,9 @@ const count = session.get("count");
     <h1>Welcome to <span class="text-gradient">Astro Session</span></h1>
 
     <section>
-      <h2>Your session</h2>
+      {msg && <Alert>{msg}</Alert>}
 
-      {msg && <p style="background-color: green">{msg}</p>}
+      <h2>Your session</h2>
 
       <code>
         {JSON.stringify(session.toJSON())}
