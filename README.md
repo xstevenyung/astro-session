@@ -49,7 +49,7 @@ The input/output to a session storage object are HTTP cookies. `getSession()` re
 import { getSession, commitSession } from "../session"
 
 // get the session
-const session = getSession(Astro.request);
+const session = await getSession(Astro.request);
 
 // update specific value in the session
 session.set('count', session.get('count') + 1);
@@ -60,7 +60,7 @@ session.set('count', session.get('count') + 1);
 const count = session.get('count');
 
 // save the session in the cookie (mandatory to persist data from one request to another)
-Astro.response.headers.set("set-cookie", commitSession(session));
+Astro.response.headers.set("set-cookie", await commitSession(session));
 ---
 
 <p>You visited this page: {{ count }}</p>
@@ -76,7 +76,7 @@ import type { APIContext } from "astro";
 import { commitSession, getSession } from "../../utils/session";
 
 export async function post({ request }: APIContext) {
-  const session = getSession(request);
+  const session = await getSession(request);
   const formData = await request.formData();
 
   const email = formData.get("email");
@@ -94,7 +94,7 @@ export async function post({ request }: APIContext) {
       headers: {
         location: "/login",
         // commit the session to persist it
-        "set-cookie": commitSession(session),
+        "set-cookie": await commitSession(session),
       },
     });
   }
@@ -108,7 +108,7 @@ export async function post({ request }: APIContext) {
     headers: {
       location: "/dashboard",
       // commit the session to persist it
-      "set-cookie": commitSession(session),
+      "set-cookie": await commitSession(session),
     },
   });
 }
@@ -121,7 +121,7 @@ And in our page:
 // src/routes/login.astro
 import { getSession, commitSession } from "astro-session";
 
-const session = getSession(Astro.request);
+const session = await getSession(Astro.request);
 
 // if the user is already authenticated, redirect to the dashboard
 if (!session.get('user')) {
@@ -133,7 +133,7 @@ if (!session.get('user')) {
 const error = session.flash('error');
 
 // persist the session data
-Astro.response.headers.set("set-cookie", commitSession(session));
+Astro.response.headers.set("set-cookie", await commitSession(session));
 ---
 
 <!-- display error if there is any in the session -->
