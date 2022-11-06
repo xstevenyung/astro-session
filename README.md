@@ -1,4 +1,6 @@
-![Astro Session](./assets/banner.svg)
+<p align="center">
+  ![Astro Session](./assets/banner.svg)
+</p>
 
 ## Why use Astro Session?
 
