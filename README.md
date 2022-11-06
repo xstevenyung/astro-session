@@ -1,5 +1,8 @@
 <p align="center">
-  ![Astro Session](./assets/banner.svg)
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/banner.svg">
+    <img src="./assets/banner.svg" height="128">
+  </picture>
 </p>
 
 ## Why use Astro Session?
