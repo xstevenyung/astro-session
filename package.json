@@ -1,35 +1,29 @@
 {
   "name": "astro-session",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/index.umd.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/src/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs"
-    }
+    ".": "./src/index.mjs",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build && tsc",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "jsonwebtoken": "^8.5.1",
-    "lodash.merge": "^4.6.2"
-  },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.4",
     "@types/node": "^18.8.4",
-    "astro": "^1.4.0",
+    "astro": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
     "typescript": "^4.8.4",
-    "vite": "^3.1.6"
+    "vite": "^4.5.0"
   },
   "peerDependencies": {
-    "astro": "^1.4.0"
+    "astro": "^3.0.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

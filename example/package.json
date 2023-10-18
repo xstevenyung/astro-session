@@ -1,8 +1,7 @@
 {
-  "name": "@example/cookies",
+  "name": "example",
   "type": "module",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -11,10 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^1.1.0",
-    "@astrojs/tailwind": "^2.0.2",
-    "astro": "^1.4.6",
-    "astro-session": "workspace:*",
-    "tailwindcss": "^3.0.24"
+    "astro": "^3.3.2",
+    "astro-session": "file:.."
   }
 }
